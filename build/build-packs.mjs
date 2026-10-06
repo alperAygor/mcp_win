@@ -239,7 +239,12 @@ function loadPrivateKey() {
 export function normalizePem(text) {
   const t = String(text).replace(/\\r\\n|\\n/g, "\n").replace(/\r/g, "");
   const m = /-----BEGIN ([A-Z ]+)-----([\s\S]*?)-----END \1-----/.exec(t);
-  if (!m) throw new Error("CATALOG_SIGNING_KEY does not contain a PEM block (-----BEGIN PRIVATE KEY----- ... -----END PRIVATE KEY-----)");
+  if (!m) {
+    // shape only, never content: enough to tell "empty", "a path", "JSON", "only the base64 body" ... apart
+    const first = t.trim()[0] ?? "";
+    const kind = !first ? "empty" : first === "-" ? "starts with dashes" : /[A-Za-z0-9+/]/.test(first) ? "starts with a letter/digit" : first === "{" ? "looks like JSON" : first === '"' || first === "'" ? "starts with a quote" : "starts with another character";
+    throw new Error(`CATALOG_SIGNING_KEY does not contain a PEM block (-----BEGIN PRIVATE KEY----- ... -----END PRIVATE KEY-----). Shape of the value: ${t.length} characters, ${t.split("\n").length} line(s), ${kind}, has "BEGIN": ${/BEGIN/.test(t)}, has "PRIVATE": ${/PRIVATE/.test(t)}, has "END": ${/END/.test(t)}`);
+  }
   if (!/PRIVATE KEY/.test(m[1])) throw new Error(`CATALOG_SIGNING_KEY holds a "${m[1]}", not a private key: paste the contents of build/keys/catalog-private.pem`);
   const body = m[2].replace(/[^A-Za-z0-9+/=]/g, "");
   if (!body) throw new Error("CATALOG_SIGNING_KEY has an empty PEM body");
