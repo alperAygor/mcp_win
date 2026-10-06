@@ -101,17 +101,19 @@ Yeni bir MCP eklemek: `build/packs.json` (kaynak + sürüm/commit) → `python b
 
 ## Yayınlama (GitHub ile, elle adres girmeden)
 
-1. Bu klasörü **herkese açık** bir GitHub deposuna koyun (kullanıcılar paketleri kimlik doğrulamasız indirir; özel depo için `versions.json > catalog.baseUrl` ile başka bir adres verin).
-2. **Katalog imza anahtarı** üretildi: açık anahtar `app/lib/catalog-key.mjs` içinde, özel anahtar `build/keys/catalog-private.pem` (git dışı, yedekleyin!).
-   Özel anahtarın içeriğini depo sırrı **`CATALOG_SIGNING_KEY`** olarak ekleyin (Settings > Secrets > Actions). Anahtar kaybolursa katalog bir daha imzalanamaz; yeni anahtar yeni sürümle dağıtılmalıdır.
-3. Actions > **Publish catalog** çalıştırın: tüm paketler Windows'ta derlenir, gerçek MCP el sıkışmasıyla denenir, imzalanır ve `catalog` adlı kayan sürüme yüklenir. Paket eklemek/güncellemek için yükleyiciyi yeniden yayınlamak gerekmez.
-4. `v0.2.0` gibi bir etiket gönderin: yükleyici derlenir, katalog adresi (`.../releases/download/catalog`) otomatik gömülür, test edilir, sürüme eklenir.
-5. Haftalık **Upstream watch** yeni upstream sürümlerini issue olarak bildirir (otomatik güncellemez).
+Kaynak depo **private** kalabilir. Mağaza paketleri kimlik doğrulamasız indirdiği için paketler ayrı, **herkese açık ve kod içermeyen** bir depoda (varsayılan `alperAygor/mcp_win_packs`; başka ad için depo değişkeni `PACKS_REPO`) yayınlanır.
+
+1. Herkese açık boş bir depo oluşturun (`mcp_win_packs`). Yalnızca imzalı paket zipleri ve katalog oraya gider; kaynak kod gitmez.
+2. Yazma izinli bir token üretin (fine-grained: yalnızca o depo, Contents = Read and write) ve kaynak depoya **`PACKS_REPO_TOKEN`** sırrı olarak ekleyin.
+3. **Katalog imza anahtarı**: açık anahtar `app/lib/catalog-key.mjs` içinde, özel anahtar `build/keys/catalog-private.pem` (git dışı, yedekleyin!) ve depo sırrı **`CATALOG_SIGNING_KEY`**. Kaybolursa katalog bir daha imzalanamaz.
+4. Actions > **Publish catalog** çalıştırın: paketler Windows'ta derlenir, MCP el sıkışmasıyla denenir, imzalanır, `mcp_win_packs` deposunun `catalog` sürümüne yüklenir. Paket eklemek/güncellemek için yükleyiciyi yeniden yayınlamak gerekmez.
+5. `Build installer` her push'ta çalışır; yükleyiciye katalog adresi (`https://github.com/<packs deposu>/releases/download/catalog`) otomatik gömülür. Yükleyici `.exe` dosyasını Actions çıktısından (artifact) indirip kullanıcıya doğrudan verebilirsiniz.
+6. Haftalık **Upstream watch** yeni upstream sürümlerini issue olarak bildirir (otomatik güncellemez).
 
 Kod imzalama sertifikası (`WIN_CODESIGN_PFX_BASE64` + `WIN_CODESIGN_PASSWORD`) **isteğe bağlıdır**: yoksa yükleyici imzasız çıkar ve çalışır (SmartScreen uyarır; onay metni ve BEFORE dosyası bunu anlatır).
 
 ## Dağıtımdan önce yapılacaklar
-1. Özel anahtarı yedekleyin ve `CATALOG_SIGNING_KEY` sırrına koyun (yukarıda). Yayın hattı eşleşmeyi `verify-catalog.mjs` ile kontrol eder.
+1. Özel anahtarı yedekleyin; `CATALOG_SIGNING_KEY` ve `PACKS_REPO_TOKEN` sırlarını ekleyin (yukarıda). Yayın hattı eşleşmeyi `verify-catalog.mjs` ile kontrol eder.
 2. (İsteğe bağlı) **Kod imzalama sertifikası** (OV/EV veya Azure Trusted Signing). Şimdilik test için imzasız çalışır.
 3. **Hukuki inceleme**: onay metni avukattan geçmedi; yayıncı adı yer tutucu.
 4. **Gerçek makinede test**: aşağıdaki "Doğrulanmamışlar".

@@ -23,6 +23,7 @@ jobs:
       contents: write          # attach the packs to the rolling "catalog" release
     env:
       ARCHMCP_BUILD_PYTHON: python
+      ARCHMCP_PACKS_REPO: ${{ vars.PACKS_REPO || 'alperAygor/mcp_win_packs' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1             # v7.0.1
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020           # v7.0.0
@@ -30,11 +31,14 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97         # v7.0.0
         with: { python-version: "3.12" }
 
-      - name: Signing key must exist
+      - name: Secrets must exist
         shell: pwsh
         env:
           KEY: ${{ secrets.CATALOG_SIGNING_KEY }}
-        run: if (-not $env:KEY) { throw "Secret CATALOG_SIGNING_KEY is not set. Refusing to publish a catalog that installed apps cannot trust (see README > Publishing)." }
+          TOKEN: ${{ secrets.PACKS_REPO_TOKEN }}
+        run: |
+          if (-not $env:KEY) { throw "Secret CATALOG_SIGNING_KEY is not set. Refusing to publish a catalog that installed apps cannot trust (see README > Publishing)." }
+          if (-not $env:TOKEN) { throw "Secret PACKS_REPO_TOKEN is not set: a token with write access to the public packs repository $env:ARCHMCP_PACKS_REPO (see README > Publishing)." }
 
       - name: Unit tests
         run: npm test
@@ -66,6 +70,8 @@ jobs:
       - name: Publish to the rolling "catalog" release
         uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64   # v3.0.3
         with:
+          repository: ${{ env.ARCHMCP_PACKS_REPO }}
+          token: ${{ secrets.PACKS_REPO_TOKEN }}
           tag_name: catalog
           name: Pack catalog (rolling)
           body: "Downloadable ArchMCP packs and their signed catalog. Fetched automatically by the app's Store page; not meant to be downloaded by hand."

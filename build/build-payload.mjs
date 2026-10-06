@@ -297,8 +297,10 @@ cpSync(join(ROOT, "app"), join(OUT, "app"), { recursive: true });
 // Where the app downloads packs from. An explicit value wins (versions.json, or ARCHMCP_CATALOG_BASE_URL for another host);
 // otherwise, when built by GitHub Actions, it is the rolling "catalog" release of this very repository (see publish-catalog.yml),
 // so nobody has to type an address anywhere. The repository must be public for end users to download from it.
+// ARCHMCP_PACKS_REPO ("owner/name") = a separate PUBLIC repository that only holds the packs, so the source repository can stay private.
+const packsRepo = process.env.ARCHMCP_PACKS_REPO || process.env.GITHUB_REPOSITORY;
 const catBase = V.catalog?.baseUrl || process.env.ARCHMCP_CATALOG_BASE_URL
-  || (process.env.GITHUB_REPOSITORY ? `https://github.com/${process.env.GITHUB_REPOSITORY}/releases/download/catalog` : "");
+  || (packsRepo ? `https://github.com/${packsRepo}/releases/download/catalog` : "");
 if (catBase) { V.catalog = { ...(V.catalog ?? {}), baseUrl: catBase }; console.log(`pack catalog address: ${catBase}`); }
 else console.warn("!! no catalog address (versions.json catalog.baseUrl / GITHUB_REPOSITORY): the Store works offline from the embedded catalog only");
 writeFileSync(join(OUT, "versions.json"), JSON.stringify(V, null, 2));
