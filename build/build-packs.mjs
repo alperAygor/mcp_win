@@ -229,7 +229,21 @@ function loadPrivateKey() {
   const fallback = join(ROOT, "build", "keys", "catalog-private.pem");
   const text = pem ?? (existsSync(fallback) ? readFileSync(fallback, "utf8") : null);
   if (!text) throw new Error("no signing key: set CATALOG_SIGNING_KEY, pass --key, or run node build/make-keys.mjs");
-  return createPrivateKey(text);
+  return createPrivateKey(normalizePem(text));
+}
+
+/**
+ * Secret stores and copy/paste mangle PEM text (CRLF, literal "\\n", lost line breaks, stray quotes/spaces). Pull the base64 body out
+ * and re-wrap it so any of those still loads; say clearly when what was pasted is not a private key at all.
+ */
+export function normalizePem(text) {
+  const t = String(text).replace(/\\r\\n|\\n/g, "\n").replace(/\r/g, "");
+  const m = /-----BEGIN ([A-Z ]+)-----([\s\S]*?)-----END \1-----/.exec(t);
+  if (!m) throw new Error("CATALOG_SIGNING_KEY does not contain a PEM block (-----BEGIN PRIVATE KEY----- ... -----END PRIVATE KEY-----)");
+  if (!/PRIVATE KEY/.test(m[1])) throw new Error(`CATALOG_SIGNING_KEY holds a "${m[1]}", not a private key: paste the contents of build/keys/catalog-private.pem`);
+  const body = m[2].replace(/[^A-Za-z0-9+/=]/g, "");
+  if (!body) throw new Error("CATALOG_SIGNING_KEY has an empty PEM body");
+  return `-----BEGIN ${m[1]}-----\n${body.match(/.{1,64}/g).join("\n")}\n-----END ${m[1]}-----\n`;
 }
 
 const indexPath = join(OUT, "packs-index.json");
