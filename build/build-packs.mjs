@@ -92,12 +92,11 @@ function applyPatches(stage, patches = []) {
   }
 }
 
+// Direct release-download URL: no GitHub API call, so no rate limit on shared CI runners (the SHA-256 pin verifies the bytes anyway).
 async function ghAsset(repo, tag, asset) {
-  const meta = await (await fetch(`https://api.github.com/repos/${repo}/releases/tags/${tag}`, { headers: { "user-agent": "archmcp-build" } })).json();
-  const a = meta.assets?.find((x) => x.name === asset);
-  if (!a) throw new Error(`asset ${asset} not found in ${repo}@${tag}`);
-  const res = await fetch(a.browser_download_url, { redirect: "follow" });
-  if (!res.ok) throw new Error(`HTTP ${res.status} for ${a.browser_download_url}`);
+  const url = `https://github.com/${repo}/releases/download/${encodeURIComponent(tag)}/${encodeURIComponent(asset)}`;
+  const res = await fetch(url, { redirect: "follow", headers: { "user-agent": "archmcp-build" } });
+  if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
   return Buffer.from(await res.arrayBuffer());
 }
 
