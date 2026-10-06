@@ -13,7 +13,8 @@ import { fakePc } from "./helpers.mjs";
 // A real TOML parser (Python's tomllib) checks what we write for Codex. Skipped where no Python >= 3.11 exists.
 const PY = [process.env.PYTHON, "python3.13", "python3.12", "python3.11", "python3", "python"].filter(Boolean).find((p) => spawnSync(p, ["-c", "import tomllib"]).status === 0);
 const parseToml = (text) => {
-  const r = spawnSync(PY, ["-c", "import sys,tomllib,json;print(json.dumps(tomllib.loads(sys.stdin.read())))"], { input: text, encoding: "utf8" });
+  // PYTHONUTF8: on Windows Python would otherwise read stdin as cp1252 and mangle non-ASCII characters
+  const r = spawnSync(PY, ["-c", "import sys,tomllib,json;print(json.dumps(tomllib.loads(sys.stdin.read())))"], { input: text, encoding: "utf8", env: { ...process.env, PYTHONUTF8: "1" } });
   assert.equal(r.status, 0, `tomllib rejected the file:\n${r.stderr}\n${text}`);
   return JSON.parse(r.stdout);
 };

@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { fakePc } from "./helpers.mjs";
+import { childEnv, fakePc } from "./helpers.mjs";
 import { KEY_PREFIX, REGISTRY, buildEntries, byId, isInstalled, keysOf } from "../app/lib/registry.mjs";
 import { defaultSettings, normalizeSettings, sanitizeOption, updateSettings } from "../app/lib/settings.mjs";
 import { DETECTORS } from "../app/lib/detect.mjs";
@@ -278,14 +278,14 @@ test("setup CLI: components -> settings patch; install registers + deploys; unin
 
   const pc = fakePc({ apps: { "Autodesk/Revit 2026/Revit.exe": 1 } });
   writeFileSync(pc.claudeCfg, JSON.stringify({ mcpServers: { mine: { command: "x" } } }));
-  const env = { ...process.env, ...pc.env };
+  const env = childEnv(pc.env);
   const run = (a) => spawnSync(process.execPath, [SETUP, ...a, "--app-dir", pc.appDir], { env, encoding: "utf8" });
 
   const r = run(["--action", "install", "--components", "revit:2026,blender,freecad,godot,openscad,unity", "--consent"]);
   assert.ok([0, 2].includes(r.status), r.stdout + r.stderr);
   const cfg = JSON.parse(readFileSync(pc.claudeCfg, "utf8"));
   assert.deepEqual(Object.keys(cfg.mcpServers).sort(), ["archmcp-blender", "archmcp-freecad", "archmcp-godot", "archmcp-openscad", "archmcp-revit-2026", "archmcp-unity", "mine"]);
-  assert.ok(existsSync(join(pc.env.APPDATA, "Autodesk", "Revit", "Addins", "2026", "RevitMCPAddin.dll")));
+  assert.ok(existsSync(join(pc.env.APPDATA, "Autodesk", "Revit", "Addins", "2026", "RevitMCPAddin.dll")), `add-in not deployed. setup output:\n${r.stdout}${r.stderr}`);
   const saved = JSON.parse(readFileSync(join(pc.env.APPDATA, "ArchMCP", "settings.json"), "utf8"));
   assert.equal(saved.mcps.revit.enabled, true); assert.equal(saved.mcps.autocad.enabled, false); assert.ok(saved.consentAcceptedAt);
 
@@ -302,7 +302,7 @@ test("setup CLI: components -> settings patch; install registers + deploys; unin
 test("the installer's component choice gates 'installed' even when the files exist (shared Python runtime)", () => {
   const pc = fakePc();
   assert.equal(isInstalled(pc.ctx, byId("freecad")), true); // no components.json: development layout, everything counts
-  const env = { ...process.env, ...pc.env };
+  const env = childEnv(pc.env);
   const r = spawnSync(process.execPath, [SETUP, "--action", "install", "--app-dir", pc.appDir, "--components", "blender"], { env, encoding: "utf8" });
   assert.ok([0, 2].includes(r.status), r.stdout + r.stderr);
   assert.equal(isInstalled(pc.ctx, byId("blender")), true);
@@ -313,7 +313,7 @@ test("the installer's component choice gates 'installed' even when the files exi
 test("re-running the installer keeps downloaded packs registered but follows the new core selection", () => {
   const pc = fakePc();
   writeFileSync(join(pc.appDir, "components.json"), JSON.stringify({ components: ["blender", "ableton", "rhino"] }));
-  const env = { ...process.env, ...pc.env };
+  const env = childEnv(pc.env);
   const r = spawnSync(process.execPath, [SETUP, "--action", "install", "--app-dir", pc.appDir, "--components", "revit:2026"], { env, encoding: "utf8" });
   assert.ok([0, 2].includes(r.status), r.stdout + r.stderr);
   const comps = JSON.parse(readFileSync(join(pc.appDir, "components.json"), "utf8")).components;

@@ -33,3 +33,11 @@ export function fakePc({ installed = REGISTRY.map((d) => d.id), apps = {} } = {}
   for (const [k, v] of Object.entries(apps)) if (v) app(...k.split("/"));
   return { root, env, appDir, ctx, touch, claudeCfg: join(env.APPDATA, "Claude", "claude_desktop_config.json") };
 }
+
+/** Environment for a child process on a fake profile. Windows variable names are case-insensitive, so a real `PROGRAMFILES` would
+ *  silently compete with the fake `ProgramFiles`: drop every real variable the fake profile redefines, whatever its spelling. */
+export function childEnv(fake) {
+  const fakeKeys = new Set(Object.keys(fake).map((k) => k.toLowerCase()));
+  const real = Object.fromEntries(Object.entries(process.env).filter(([k]) => !fakeKeys.has(k.toLowerCase())));
+  return { ...real, ...fake };
+}
