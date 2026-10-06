@@ -101,7 +101,7 @@ Yeni bir MCP eklemek: `build/packs.json` (kaynak + sürüm/commit) → `python b
 
 ## Yayınlama (GitHub ile, elle adres girmeden)
 
-Kaynak depo **private** kalabilir (ya da sonradan herkese açılırsa: depo değişkeni `PACKS_REPO` = bu deponun adı yapılır, ayrı paket deposu ve `PACKS_REPO_TOKEN` gerekmez). Mağaza paketleri kimlik doğrulamasız indirdiği için paketler ayrı, **herkese açık ve kod içermeyen** bir depoda (varsayılan `alperAygor/mcp_win_packs`; başka ad için depo değişkeni `PACKS_REPO`) yayınlanır.
+Kaynak depo **private** kalabilir (ya da sonradan herkese açılırsa: depo değişkeni `PACKS_REPO` = bu deponun adı yapılır, ayrı paket deposu ve `PACKS_REPO_TOKEN` gerekmez). Mağaza paketleri kimlik doğrulamasız indirdiği için paketler ayrı, **herkese açık ve kod içermeyen** bir depoda (varsayılan: kaynak deponun kendisi; ayrı bir depo için depo değişkeni `PACKS_REPO`) yayınlanır.
 
 1. Herkese açık boş bir depo oluşturun (`mcp_win_packs`). Yalnızca imzalı paket zipleri ve katalog oraya gider; kaynak kod gitmez.
 2. Yazma izinli bir token üretin (fine-grained: yalnızca o depo, Contents = Read and write) ve kaynak depoya **`PACKS_REPO_TOKEN`** sırrı olarak ekleyin.

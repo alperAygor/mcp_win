@@ -19,7 +19,7 @@ jobs:
     env:
       ARCHMCP_BUILD_PYTHON: python
       # the PUBLIC repository that hosts the downloadable packs (source repo may be private); override with the repo variable PACKS_REPO
-      ARCHMCP_PACKS_REPO: ${{ vars.PACKS_REPO || 'alperAygor/mcp_win_packs' }}
+      ARCHMCP_PACKS_REPO: ${{ vars.PACKS_REPO || github.repository }}
     steps:
       # every third-party action is pinned to a full commit (tags can be moved; commits cannot)
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1             # v7.0.1

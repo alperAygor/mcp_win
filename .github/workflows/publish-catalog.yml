@@ -23,7 +23,7 @@ jobs:
       contents: write          # attach the packs to the rolling "catalog" release
     env:
       ARCHMCP_BUILD_PYTHON: python
-      ARCHMCP_PACKS_REPO: ${{ vars.PACKS_REPO || 'alperAygor/mcp_win_packs' }}
+      ARCHMCP_PACKS_REPO: ${{ vars.PACKS_REPO || github.repository }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1             # v7.0.1
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020           # v7.0.0
