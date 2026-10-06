@@ -271,6 +271,12 @@ test("unity add-on: only real Unity projects, embedded in Packages, and only for
 
 // ------------------------------------------------------------------ installer CLI end to end
 
+/** What a child process really sees of the fake profile (shown only when a CLI test fails, to tell env problems from code problems). */
+function childView(env, pc) {
+  const r = spawnSync(process.execPath, ["-e", "const {existsSync}=require('fs');const p=require('path');const pf=process.env.ProgramFiles;console.log(JSON.stringify({ProgramFiles:pf,x86:process.env['ProgramFiles(x86)'],exe:pf&&existsSync(p.join(pf,'Autodesk','Revit 2026','Revit.exe'))}))"], { env, encoding: "utf8" });
+  return `child sees: ${r.stdout.trim()} | fake ProgramFiles: ${pc.env.ProgramFiles} | exe exists: ${existsSync(join(pc.env.ProgramFiles, "Autodesk", "Revit 2026", "Revit.exe"))}`;
+}
+
 test("setup CLI: components -> settings patch; install registers + deploys; uninstall removes only ours", () => {
   assert.deepEqual(parseComponents("revit:2025+2026,autocad:unsafe,blender,bogus"), { revit: { versions: [2025, 2026] }, autocad: { unsafe: true }, blender: {} });
   const patch = componentsToPatch(parseComponents("revit:2026,autocad:unsafe"));
@@ -285,7 +291,7 @@ test("setup CLI: components -> settings patch; install registers + deploys; unin
   assert.ok([0, 2].includes(r.status), r.stdout + r.stderr);
   const cfg = JSON.parse(readFileSync(pc.claudeCfg, "utf8"));
   assert.deepEqual(Object.keys(cfg.mcpServers).sort(), ["archmcp-blender", "archmcp-freecad", "archmcp-godot", "archmcp-openscad", "archmcp-revit-2026", "archmcp-unity", "mine"]);
-  assert.ok(existsSync(join(pc.env.APPDATA, "Autodesk", "Revit", "Addins", "2026", "RevitMCPAddin.dll")), `add-in not deployed. setup output:\n${r.stdout}${r.stderr}`);
+  assert.ok(existsSync(join(pc.env.APPDATA, "Autodesk", "Revit", "Addins", "2026", "RevitMCPAddin.dll")), `add-in not deployed. setup output:\n${r.stdout}${r.stderr}\n${childView(env, pc)}`);
   const saved = JSON.parse(readFileSync(join(pc.env.APPDATA, "ArchMCP", "settings.json"), "utf8"));
   assert.equal(saved.mcps.revit.enabled, true); assert.equal(saved.mcps.autocad.enabled, false); assert.ok(saved.consentAcceptedAt);
 
