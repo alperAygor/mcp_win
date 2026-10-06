@@ -1,0 +1,63 @@
+<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ArchMCP Kullanım Kılavuzu</title><style>
+:root{--bg:#fff;--fg:#1d1d1f;--mut:#5f6368;--line:#e2e2e5;--card:#f6f6f8;--warn:#fff4e5;--warnb:#f0a030;--acc:#2a5bd7}
+@media(prefers-color-scheme:dark){:root{--bg:#161618;--fg:#ececee;--mut:#a0a0a8;--line:#2e2e33;--card:#1e1e22;--warn:#2b2214;--warnb:#c9852a;--acc:#7da2ff}}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,Segoe UI,sans-serif}
+main{max-width:820px;margin:0 auto;padding:32px 20px 64px}
+h1{font-size:28px;margin:0 0 4px}h2{font-size:20px;margin:36px 0 8px;border-bottom:1px solid var(--line);padding-bottom:6px}
+p.sub{color:var(--mut);margin:0 0 24px}table{border-collapse:collapse;width:100%;margin:12px 0;font-size:15px}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}th{background:var(--card)}
+code{background:var(--card);padding:1px 6px;border-radius:4px;font-size:14px}
+.warn{background:var(--warn);border-left:4px solid var(--warnb);padding:10px 14px;margin:16px 0;border-radius:4px}
+a{color:var(--acc)}li{margin:4px 0}
+</style></head><body><main>
+<h1>ArchMCP Kullanım Kılavuzu</h1><p class="sub">Claude ile Revit, AutoCAD, Photoshop ve SketchUp'ta çalışmak için.</p>
+
+<div class="warn"><b>Çalışmadan önce yedek alın.</b> Verdiğiniz tam yetkiyle Claude modelinizi/çiziminizi/dosyalarınızı değiştirebilir ve silebilir; bazı işlemler (Photoshop'ta üzerine yazma, silme, birleştirme) geri alınamaz.</div>
+
+<h2>1. Başlamak: ArchMCP kontrol paneli</h2>
+<ol>
+<li>Başlat menüsünden veya masaüstünden <b>ArchMCP</b>'yi açın.</li>
+<li><b>Bağlantılar</b> sayfasında kullanmak istediğiniz yazılımın anahtarını açın. Eksik uygulama eklentisi (Revit, Blender, FreeCAD, Photoshop) otomatik kurulur.</li>
+<li><b>Uygula ve Claude'u yeniden başlat</b>'a basın. Claude, sunucuları kendi açılışında başlatır; bu yüzden bir kez yeniden başlaması gerekir. (Açık sohbet kesilir, panel önce sorar.)</li>
+<li>Yazılımınızı açın (aşağıdaki tabloya bakın) ve Claude'da yeni bir sohbet başlatın; sohbet kutusundaki araçlar simgesinde <code>archmcp-…</code> sunucularını görürsünüz.</li>
+<li>Normal Türkçe ile isteyin. Claude gerekli araçları kendisi seçer.</li>
+</ol>
+<p>Panelde: her kartta <b>Test et</b> (sunucuyu gerçekten başlatır), <b>Ayrıntılar</b> (seçenekler, yetkiler, eklenti kurulumu), <b>Ayarlar</b> (dil, görünüm, yedekler), <b>Tanılama</b> (hepsini tek seferde test), <b>Günlükler</b>. Panel kapatılınca kendiliğinden durur; Claude'un bağlantıları panel kapalıyken de çalışır.</p>
+
+<h2>2. Yazılım bazında</h2>
+<table><tr><th>Yazılım</th><th>Hazırlık</th><th>Örnek istekler</th></tr>
+<tr><td><b>Revit</b> 2025/26/27</td><td>Revit'i ve bir projeyi açın. Eklenti otomatik yüklenir; ilk açılışta güvenlik penceresi çıkarsa "Her zaman yükle" seçin.</td><td>"Seviyeleri ve oda alanlarını listele." · "3. kattaki tüm kapıları say."</td></tr>
+<tr><td><b>AutoCAD 2026</b></td><td>AutoCAD 2026'yı ve bir çizimi açın. <b>Yalnızca 2026 desteklenir.</b> AutoCAD kapalıysa yalnızca DXF dosyaları üzerinde (ekransız) çalışılır.</td><td>"5x4 m bir oda duvarlarıyla çiz." · "Çizimdeki tüm katmanları listele."</td></tr>
+<tr><td><b>Photoshop</b> 25+</td><td>Photoshop'u açın; <i>Eklentiler (Plugins)</i> menüsünden <b>Photoshop MCP</b> panelini açın ve açık bırakın.</td><td>"Katmanları listele." · "Belgeyi 2000 px genişliğe küçült."</td></tr>
+<tr><td><b>Blender</b></td><td>Blender'ı açın. Eklenti ArchMCP tarafından kurulur ve etkinleştirilir; değilse Edit → Preferences → Add-ons'ta "MCP for Blender"ı açın. 3B görünümde <code>N</code> → "MCP for Blender" → gerekirse <i>Start MCP Server</i>.</td><td>"Sahneye 3 metrelik bir küp ve kırmızı malzeme ekle." · "Kamera görüntüsünü göster."</td></tr>
+<tr><td><b>FreeCAD</b></td><td>FreeCAD'i yeniden başlatın, çalışma tezgâhı listesinden <b>MCP Addon</b>'u seçin ve araç çubuğunda <i>Start RPC Server</i>'a basın (<i>Auto-Start Server</i> işaretlenebilir).</td><td>"20 mm çaplı 50 mm yüksekliğinde bir silindir oluştur."</td></tr>
+<tr><td><b>OpenSCAD</b></td><td>OpenSCAD kurulu olmalı; yolu panel otomatik bulur (bulamazsa Ayrıntılar'dan seçin).</td><td>"M6 vida delikli bir braket tasarla ve ölçülerini doğrula."</td></tr>
+<tr><td><b>Godot</b></td><td>Panelde Ayrıntılar'dan <code>godot.exe</code> yolunu seçin (Godot tek bir .exe olarak gelir).</td><td>"Projeyi çalıştır ve hata çıktısını göster." · "Yeni bir 2D sahne oluştur."</td></tr>
+<tr><td><b>Unity</b></td><td>Panelde Ayrıntılar'dan projenizi ekleyip <i>Paketi ekle</i>'ye basın (paket projenin <code>Packages</code> klasörüne kopyalanır, git gerekmez). Sonra projeyi Unity'de açın; ilk içe aktarmada Unity kendi bağımlılıklarını indirir.</td><td>"Sahneye bir küp ekle ve Rigidbody ver."</td></tr>
+<tr><td><b>SketchUp</b></td><td>Kurulumla gelmez. Claude → Ayarlar → Bağlayıcılar → "SketchUp" ekleyin, Trimble hesabınızla giriş yapın.</td><td>"Bir tarafı 10 m olan iki katlı basit bir ev modeli yap."</td></tr></table>
+
+<h2>3. Claude'a verdiğiniz yetkiler</h2>
+<table><tr><th>Yazılım</th><th>İzin</th></tr>
+<tr><td>Revit</td><td>Okuma + oluşturma/değiştirme/silme (işlemler Revit'te tek bir "Geri Al" adımı olarak yapılır — Ctrl+Z ile geri alabilirsiniz).</td></tr>
+<tr><td>AutoCAD</td><td>Okuma, değiştirme, silme, temizleme, kaydetme/üzerine yazma. <b>Ham komut kısıtlaması açıktır</b>: SHELL, NETLOAD, APPLOAD, VBARUN gibi program çalıştıran komutlar engellidir.</td></tr>
+<tr><td>Photoshop</td><td><code>read, edit, external, destructive</code> — varsayılan olarak tamamı (dosya yazma/okuma, üzerine yazma, silme, birleştirme dahil). Panelden daraltabilirsiniz.</td></tr>
+<tr><td>Blender</td><td>Açık Blender'da Python çalıştırır. <b>Güvenli mod</b> (panelden) dosya, program ve ağ kullanan kodu engeller.</td></tr>
+<tr><td>FreeCAD / Godot / Unity / OpenSCAD</td><td>Model/proje/sahne/betik düzenleme ve (FreeCAD'de) Python çalıştırma. Unity'de editör eklentisi projenizin içindedir.</td></tr></table>
+<p>Telemetri: Blender ve Unity sunucularının kendi (varsayılan açık) telemetrisi ArchMCP tarafından kapatılır.</p>
+<p>Claude'un yaptığı değişiklikleri her zaman kontrol edin. Güvenmediğiniz kaynaklardan gelen dosyaların içindeki metinler Claude'u yanıltabilir.</p>
+
+<h2>4. Sorun giderme</h2>
+<p>Önce <b>Başlat menüsü → ArchMCP → ArchMCP Tanılama</b>'yı çalıştırın; her sunucuyu Claude'un yaptığı gibi başlatır ve ne eksik olduğunu söyler.</p>
+<table><tr><th>Belirti</th><th>Çözüm</th></tr>
+<tr><td>Claude'da <code>archmcp-…</code> görünmüyor</td><td>Claude'u sistem tepsisinden de çıkıp yeniden açın. Tanılama "Claude config" satırını kontrol eder.</td></tr>
+<tr><td>Revit: "add-in ulaşılamıyor"</td><td>Revit'i o sürümle (ör. 2026) açın ve bir proje açın; eklenti Revit açılırken yüklenir.</td></tr>
+<tr><td>Photoshop: "bridge ulaşılamıyor"</td><td>Photoshop'u açın ve Eklentiler → Photoshop MCP panelini açın. Eklenti listede yoksa kurulum klasöründeki <code>servers\photoshop-plugin\photoshop-mcp.ccx</code> dosyasına çift tıklayın ve Photoshop'u yeniden başlatın.</td></tr>
+<tr><td>AutoCAD bağlanmıyor</td><td>AutoCAD 2026'nın açık ve bir çizimin yüklü olduğundan emin olun.</td></tr>
+<tr><td>Antivirüs dosyaları siliyor</td><td><code>%LOCALAPPDATA%\Programs\ArchMCP</code> klasörünü istisna listesine ekleyip kurulumu yeniden çalıştırın.</td></tr>
+<tr><td>Panel açılmıyor</td><td>Microsoft Edge veya Chrome gerekir (Windows'ta Edge hazır gelir). Başlat menüsünden ArchMCP'yi yeniden başlatın; hâlâ olmazsa Tanılama için "ArchMCP Tanılama"yı çalıştırın.</td></tr>
+<tr><td>Unity bağlanmıyor</td><td>Projede paket kurulu mu (panelde yeşil "kurulu")? Unity'de Window → MCP for Unity penceresinden bağlantının açık olduğunu kontrol edin.</td></tr>
+<tr><td>Claude config dosyası geçersiz</td><td>Kurulum bozuk bir <code>claude_desktop_config.json</code>'a dokunmaz. Dosyayı düzeltin (yedekleri aynı klasördedir) ve kurulumu yeniden çalıştırın.</td></tr></table>
+
+<h2>5. Kaldırma</h2>
+<p><b>Ayarlar → Uygulamalar → ArchMCP → Kaldır.</b> Claude yapılandırmanızdaki <code>archmcp-…</code> kayıtları, Revit eklentisi ve Photoshop eklentisi silinir. Başkalarına ait sunucularınıza dokunulmaz. Kaldırırken Revit ve Photoshop kapalı olmalıdır (açıksa eklenti dosyaları silinemez). Unity projelerinize eklenen paket, projeleriniz sürüm kontrolünde olabileceği için <b>silinmez</b>; istiyorsanız kaldırmadan önce panelde ilgili projede <i>Kaldır</i>'a basın. Claude yapılandırmasının kurulumdan önce alınan yedekleri (<code>…archmcp-backup-…</code>) silinmez.</p>
+</main></body></html>

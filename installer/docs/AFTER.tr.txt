@@ -1,0 +1,25 @@
+﻿
+KURULUM TAMAMLANDI - İLK ADIMLAR
+
+ArchMCP kontrol paneli: Başlat menüsü veya masaüstündeki "ArchMCP" kısayolu.
+Burada Claude'a bağlamak istediğiniz yazılımları açıp kapatır, ayarları değiştirir, test eder ve uygularsınız.
+
+1. ArchMCP'yi açın, kullanmak istediğiniz bağlantıların anahtarını açın.
+2. "Uygula ve Claude'u yeniden başlat" düğmesine basın (Claude, sunucuları kendi açılışında başlatır).
+3. Yazılımınızı hazırlayın (ayrıntı için her kartta "Ayrıntılar"):
+   Revit      : Revit'i ve bir projeyi açın (güvenlik penceresi çıkarsa "Her zaman yükle").
+   AutoCAD    : AutoCAD 2026'yı ve bir çizimi açın.
+   Photoshop  : Eklentiler > "Photoshop MCP" panelini açın.
+   Blender    : Eklenti etkin olmalı; N paneli > "MCP for Blender" > gerekirse "Start MCP Server".
+   FreeCAD    : "MCP Addon" çalışma tezgâhı > "Start RPC Server".
+   OpenSCAD   : OpenSCAD kurulu olmalı (yol otomatik bulunur).
+   Godot      : godot.exe yolunu panelden seçin.
+   Unity      : Panelde projeyi ekleyip "Paketi ekle"ye basın, sonra projeyi Unity'de açın.
+   SketchUp   : Claude > Ayarlar > Bağlayıcılar > "SketchUp" ekleyin ve giriş yapın.
+4. Claude'da sohbet kutusundaki araçlar simgesinde "archmcp-..." sunucularını görürsünüz. Deneyin: "Açık Revit projemdeki seviyeleri listele."
+
+ÖNEMLİ: Claude, verdiğiniz yetkiyle dosyalarınızı değiştirebilir/silebilir. Çalışmadan önce yedek alın. Yetkileri panelden daraltabilirsiniz.
+
+SORUN MU VAR?
+ArchMCP > "Tanılama" her sunucuyu gerçekten başlatıp test eder. Ayrıntılı rehber: Başlat menüsü > ArchMCP > "Kullanım Kılavuzu".
+Kaldırmak için: Ayarlar > Uygulamalar > ArchMCP.

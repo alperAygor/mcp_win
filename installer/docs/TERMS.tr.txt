@@ -1,0 +1,43 @@
+﻿ARCHMCP KULLANIM KOŞULLARI VE YETKİ ONAYI
+
+Devam etmeden önce lütfen dikkatle okuyun. Kurulum, bu metni kabul etmediğiniz sürece sürdürülemez.
+
+1. ArchMCP NEDİR
+ArchMCP, Claude (yapay zekâ asistanı) ile Revit, AutoCAD ve Photoshop arasında köprü kuran açık kaynaklı MCP sunucularını bilgisayarınıza kurar ve Claude Desktop'a bağlar. SketchUp bağlayıcısı Trimble'ın bulut hizmetidir ve Claude içinden ayrıca eklenir.
+
+2. VERDİĞİNİZ TAM YETKİ
+Kurulumu tamamlayarak Claude'a, sizin adınıza ve sizin hesabınızın yetkileriyle şunları yapma yetkisi vermiş olursunuz:
+ - Revit: modelde eleman oluşturma, değiştirme ve silme; çoklu adımlı işlemleri tek işlemde çalıştırma.
+ - AutoCAD 2026: çizimde nesne oluşturma, değiştirme, silme; çizimi temizleme, kaydetme ve başka adla/üzerine yazarak kaydetme; dosya dışa aktarma.
+ - Photoshop: belgeleri düzenleme; diske dosya yazma ve okuma; dosyaların üzerine yazma, silme ve katman birleştirme gibi GERİ ALINAMAZ işlemler.
+ - Blender: açık Blender oturumunda Python kodu çalıştırma; sahneyi, nesneleri ve dosyaları değiştirme.
+ - FreeCAD: modelleri oluşturma/değiştirme ve açık FreeCAD'de Python kodu çalıştırma.
+ - OpenSCAD: kod yazma, render etme ve dosya dışa aktarma.
+ - Godot: editörü açma, projeyi çalıştırma, proje sahne ve dosyalarını değiştirme.
+ - Unity: açık Unity Editor'de sahne, nesne, C# betiği ve asset oluşturma/değiştirme/silme; test ve build çalıştırma.
+ - Mağaza'dan sonradan eklenen bağlantılar (Ableton Live, Fusion, Rhino, Archicad, SolidWorks, Maya, IFC, Unreal Engine, MATLAB/Simulink, Bonsai, QGIS, Altium, Abaqus, Ansys, Siemens NX, Inventor, ETABS, OpenSeesPy): ilgili programda model, proje, çizim veya dosyaları oluşturma, değiştirme, silme ve kod çalıştırma. MATLAB, Unreal, Maya, Rhino, Blender, FreeCAD, Inventor ve benzerlerinde Claude keyfi kod çalıştırabilir.
+ (Kontrol panelinden her bağlantının yetkilerini daraltabilir veya kapatabilirsiniz.)
+ - YAPISAL VE MÜHENDİSLİK ANALİZİ: ETABS, OpenSeesPy, Ansys, Abaqus, MATLAB gibi analiz yazılımlarının sonuçları, bağımsız olarak yetkili bir mühendis tarafından doğrulanmadan tasarım, güvenlik veya yapım kararlarında KULLANILAMAZ.
+ - İNDİRİLEN PAKETLER: Mağaza'daki paketler üçüncü taraf, çoğu küçük ve bağımsız geliştiricilerin açık kaynak projeleridir; "Deneysel" etiketli olanlar az test edilmiştir. Her paket imzalı kataloğa göre doğrulanır; ancak içeriğinin kusursuzluğu garanti edilmez.
+Bu işlemlerin bir kısmı Claude tarafından, her adım için ayrıca sorulmadan yapılabilir.
+
+3. YAPAY ZEKÂ HATA YAPABİLİR
+Claude yanlış anlayabilir, yanlış nesneyi silebilir veya istemediğiniz değişiklikler yapabilir. Ayrıca açtığınız dosyaların içindeki metinler (çizim notları, katman adları, öznitelikler) Claude tarafından talimat gibi algılanabilir (prompt injection). Güvenmediğiniz kaynaklardan gelen dosyalarla çalışırken ek dikkat gösterin.
+Bu nedenle: önemli projelerinizin yedeğini çalışmadan ÖNCE alın ve Claude'un yaptığı değişiklikleri kontrol edin.
+
+4. KASITLI OLARAK AÇILMAYAN YETKİ
+AutoCAD'in ham komut kısıtlaması (SHELL, NETLOAD, APPLOAD, VBARUN gibi bilgisayarınızda program çalıştırabilen komutların engellenmesi) varsayılan olarak AÇIK kalır. Kurulum sırasında ayrı, işaretsiz bir kutuyla kaldırabilirsiniz; bu seçenek bilgisayarınızın güvenliğini ciddi şekilde düşürür ve önerilmez.
+
+5. GİZLİLİK
+ArchMCP kendisi telemetri toplamaz ve verinizi dış bir sunucuya göndermez; sunucular yalnızca bilgisayarınızda (127.0.0.1) çalışır. Blender ve Unity sunucularının varsayılan olarak açık olan kendi telemetrisi bilerek kapatılır. Unity Editor eklentisi, kendi güncelleme kontrolü ve bazı özellikleri için Unity'nin içinden internete (GitHub) bağlanabilir. Ancak Claude'la paylaştığınız proje bilgileri, çizim ve görsel içerikleri Anthropic'in hizmetine iletilir ve sizin Claude üyeliğinizin koşullarına tabidir. Gizlilik sözleşmeleriniz (NDA), müşteri veya şirket politikalarınız buna izin vermiyorsa bu aracı kullanmayın.
+
+6. GARANTİ VE SORUMLULUK
+Yazılım "OLDUĞU GİBİ" sunulur; hiçbir açık veya zımni garanti verilmez. Veri kaybı, dosya bozulması, iş kaybı veya dolaylı zararlardan, yasaların izin verdiği azami ölçüde, yayıncı sorumlu tutulamaz. Claude üyeliğinizin, Revit/AutoCAD/Photoshop lisanslarınızın şartlarına uygun kullanım sizin sorumluluğunuzdadır.
+
+7. ÜÇÜNCÜ TARAF YAZILIMLAR
+ArchMCP; RevitMCPServer, photoshop-mcp ve Autocad-MCP (MIT lisanslı), Node.js ve Python çalışma ortamlarını içerir. Ayrıntı: kurulum klasöründeki THIRD_PARTY_NOTICES.md. Autodesk, Adobe, Trimble ve Anthropic ile bağlantılı veya onlar tarafından onaylanmış değildir.
+
+8. KALDIRMA
+İstediğiniz zaman Ayarlar > Uygulamalar > ArchMCP üzerinden kaldırabilirsiniz; Claude yapılandırmanızdaki (ve kurulumda veya panelden seçtiyseniz Codex, Antigravity ve OpenCode yapılandırmanızdaki) ArchMCP kayıtları, Revit eklentisi ve Photoshop eklentisi silinir.
+
+"Kabul ediyorum" seçeneğini işaretleyerek bu koşulları okuduğunuzu, anladığınızı ve yukarıdaki tam yetkiyi bilerek verdiğinizi onaylarsınız.

@@ -1,0 +1,31 @@
+name: Upstream watch
+# Once a week: do any pinned upstream projects (git commits / exact PyPI pins in build/packs.json) have a newer version?
+# It only REPORTS (job summary + one open issue). Nothing is updated automatically: a silently moved pin is the supply-chain risk
+# the pins exist to prevent. To update, edit build/packs.json, run lock_packs.py, let CI test it, then run "Publish catalog".
+on:
+  schedule: [{ cron: "17 6 * * 1" }]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1             # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020           # v7.0.0
+        with: { node-version: 22 }
+      - name: Check pins
+        run: node build/check-upstream.mjs --issue-body issue.md | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Open or update the tracking issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if grep -q '^| ' issue.md && [ "$(grep -c '^| [a-z]' issue.md)" -gt 1 ]; then
+            n=$(gh issue list --label upstream-update --state open --json number --jq '.[0].number')
+            if [ -n "$n" ]; then gh issue edit "$n" --body-file issue.md; else gh issue create --title "Newer upstream versions of pinned packs" --label upstream-update --body-file issue.md || gh issue create --title "Newer upstream versions of pinned packs" --body-file issue.md; fi
+          fi

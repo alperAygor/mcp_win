@@ -1,0 +1,77 @@
+name: Publish catalog
+# Rebuilds every downloadable pack on Windows, starts each one with a real MCP handshake, signs the catalog with the REAL key
+# (the CATALOG_SIGNING_KEY secret is mandatory here) and publishes it to the rolling "catalog" release of this repository.
+# Installed ArchMCP apps fetch packs from there (Store page), so packs can be added or updated WITHOUT shipping a new installer.
+# Run it manually (Actions > Publish catalog) after editing build/packs.json / build/locks, or let a push to those files trigger it.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["build/packs.json", "build/locks/**", "packs/**", "build/build-packs.mjs", "build/lock_packs.py"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-catalog
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    permissions:
+      contents: write          # attach the packs to the rolling "catalog" release
+    env:
+      ARCHMCP_BUILD_PYTHON: python
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1             # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020           # v7.0.0
+        with: { node-version: 22 }
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97         # v7.0.0
+        with: { python-version: "3.12" }
+
+      - name: Signing key must exist
+        shell: pwsh
+        env:
+          KEY: ${{ secrets.CATALOG_SIGNING_KEY }}
+        run: if (-not $env:KEY) { throw "Secret CATALOG_SIGNING_KEY is not set. Refusing to publish a catalog that installed apps cannot trust (see README > Publishing)." }
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Bundled Node + Python (the packs are built and tested with exactly what ships)
+        run: node build/build-payload.mjs --only node,python
+
+      - name: Build packs + signed catalog
+        env:
+          CATALOG_SIGNING_KEY: ${{ secrets.CATALOG_SIGNING_KEY }}
+          ARCHMCP_PACK_PYTHON: ${{ github.workspace }}\payload\runtime\python\python.exe
+        run: node build/build-packs.mjs --out dist/packs
+
+      - name: Pack smoke test (install every pack, start each server)
+        shell: pwsh
+        run: |
+          node build/build-payload.mjs --only none --catalog dist/packs
+          node build/ci-packs-smoke.mjs --app-dir payload --packs dist/packs --results dist/pack-results.json --node payload\runtime\node\node.exe
+          if ($LASTEXITCODE) { throw "no pack works at all" }
+
+      - name: Leave out packs that do not start (re-sign the catalog)
+        env:
+          CATALOG_SIGNING_KEY: ${{ secrets.CATALOG_SIGNING_KEY }}
+        run: node build/build-packs.mjs --catalog-only --out dist/packs --exclude-from dist/pack-results.json
+
+      - name: The catalog must verify against the public key shipped in the app
+        run: node build/verify-catalog.mjs dist/packs
+
+      - name: Publish to the rolling "catalog" release
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64   # v3.0.3
+        with:
+          tag_name: catalog
+          name: Pack catalog (rolling)
+          body: "Downloadable ArchMCP packs and their signed catalog. Fetched automatically by the app's Store page; not meant to be downloaded by hand."
+          prerelease: true
+          make_latest: "false"
+          files: |
+            dist/packs/*.zip
+            dist/packs/catalog.json
+            dist/packs/catalog.sig

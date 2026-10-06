@@ -1,0 +1,7 @@
+payload/
+dist/
+build/.cache/
+node_modules/
+.DS_Store
+build/keys/
+dist/

@@ -1,0 +1,43 @@
+﻿ARCHMCP TERMS OF USE AND PERMISSION CONSENT
+
+Please read carefully. Setup cannot continue unless you accept.
+
+1. WHAT ARCHMCP IS
+ArchMCP installs open-source MCP servers that connect Claude (an AI assistant) to Revit, AutoCAD, Photoshop, Blender, FreeCAD, OpenSCAD, Godot and Unity on this PC and registers them in Claude Desktop. You choose which ones are installed and connected to Claude, and you can switch them on and off at any time in the ArchMCP control panel. The SketchUp connector is a Trimble cloud service added separately inside Claude.
+
+2. THE FULL AUTHORITY YOU GRANT
+By completing setup you authorise Claude, acting for you and with your account's rights, to:
+ - Revit: create, modify and delete model elements; run multi-step operations in one transaction.
+ - AutoCAD 2026: create, modify and delete objects; purge, save, and save-as/overwrite drawings; export files.
+ - Photoshop: edit documents; read and write files on disk; and perform IRREVERSIBLE actions such as overwriting or deleting files and merging layers.
+ - Blender: run Python code in a live Blender session; change the scene, objects and files.
+ - FreeCAD: create/modify models and run Python code in a live FreeCAD.
+ - OpenSCAD: write code, render and export files.
+ - Godot: launch the editor, run projects, change project scenes and files.
+ - Unity: create/modify/delete scenes, objects, C# scripts and assets in a live Unity Editor; run tests and builds.
+ - Connections added later from the Store (Ableton Live, Fusion, Rhino, Archicad, SolidWorks, Maya, IFC, Unreal Engine, MATLAB/Simulink, Bonsai, QGIS, Altium, Abaqus, Ansys, Siemens NX, Inventor, ETABS, OpenSeesPy): create, modify and delete models, projects, drawings or files in the program, and run code. With MATLAB, Unreal, Maya, Rhino, Blender, FreeCAD, Inventor and similar, Claude can run arbitrary code.
+ (In the control panel you can narrow or switch off the authority of each connection.)
+ - STRUCTURAL AND ENGINEERING ANALYSIS: results from analysis software such as ETABS, OpenSeesPy, Ansys, Abaqus and MATLAB MUST NOT be used for design, safety or construction decisions unless independently verified by a qualified engineer.
+ - DOWNLOADED PACKS: Store packs are third-party, mostly small independent open-source projects; those labelled "Experimental" are lightly tested. Every pack is verified against the signed catalog, but flawless content is not guaranteed.
+Some of these actions may be performed by Claude without asking at every step.
+
+3. AI CAN MAKE MISTAKES
+Claude may misunderstand, delete the wrong object, or make changes you did not intend. Text inside files you open (drawing notes, layer names, attributes) may also be interpreted by Claude as instructions (prompt injection). Take extra care with files from untrusted sources.
+Therefore: back up important projects BEFORE you work, and review what Claude changed.
+
+4. AUTHORITY DELIBERATELY NOT GRANTED
+AutoCAD's raw-command restriction (which blocks commands able to run programs on your PC, such as SHELL, NETLOAD, APPLOAD, VBARUN) stays ON by default. You can remove it with a separate, unchecked option during setup; doing so seriously lowers your PC's security and is not recommended.
+
+5. PRIVACY
+ArchMCP itself collects no telemetry and sends no data to external servers; its servers run only on your PC (127.0.0.1). The built-in telemetry of the Blender and Unity servers, which is on by default upstream, is deliberately switched off. The Unity Editor plugin may itself connect to the internet (GitHub) from inside Unity for its update check and some features. However, project information, drawings and images you share with Claude are transmitted to Anthropic's service and are subject to the terms of your own Claude subscription. If your NDAs or your client's/employer's policies do not allow this, do not use this tool.
+
+6. WARRANTY AND LIABILITY
+The software is provided "AS IS" without warranty of any kind. To the maximum extent permitted by law, the publisher is not liable for data loss, file corruption, lost work or indirect damages. Using it in line with your Claude, Revit, AutoCAD and Photoshop licences is your responsibility.
+
+7. THIRD-PARTY SOFTWARE
+ArchMCP bundles RevitMCPServer, photoshop-mcp and Autocad-MCP (MIT licensed) plus Node.js and Python runtimes. See THIRD_PARTY_NOTICES.md in the install folder. It is not affiliated with or endorsed by Autodesk, Adobe, Trimble or Anthropic.
+
+8. REMOVAL
+You can uninstall at any time via Settings > Apps > ArchMCP; this removes the ArchMCP entries from your Claude config (and from your Codex, Antigravity and OpenCode config if you chose them during setup or in the panel), the Revit add-in and the Photoshop plugin.
+
+By selecting "I accept", you confirm that you have read and understood these terms and knowingly grant the full authority described above.

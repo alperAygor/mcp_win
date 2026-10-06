@@ -1,0 +1,204 @@
+name: Build installer
+# Builds everything on Windows: runtimes, hash-locked packs, the signed catalog, the installer - then installs it silently and
+# drives it (every server gets a real MCP handshake), uninstalls, and publishes. Secrets (all optional, see README):
+#   CATALOG_SIGNING_KEY          Ed25519 private key (PEM) that signs the pack catalog
+#   WIN_CODESIGN_PFX_BASE64      code-signing certificate (.pfx, base64)         WIN_CODESIGN_PASSWORD   its password
+on:
+  push: { branches: [main], tags: ["v*"] }
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    permissions:
+      contents: write          # only used to attach files to a release on tag pushes
+    env:
+      ARCHMCP_BUILD_PYTHON: python
+    steps:
+      # every third-party action is pinned to a full commit (tags can be moved; commits cannot)
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1             # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020           # v7.0.0
+        with: { node-version: 22 }
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97         # v7.0.0
+        with: { python-version: "3.12" }
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build core payload (Node, Python, Revit, Photoshop, Godot, Unity, FreeCAD)
+        run: node build/build-payload.mjs
+
+      - name: Smoke-test bundled runtimes and every Python server of the core
+        shell: pwsh
+        run: |
+          & payload\runtime\node\node.exe -e "console.log('node', process.version)"
+          $py = "payload\runtime\python\python.exe"
+          & $py -I -c "import win32com.client, ezdxf, blender_mcp, freecad_mcp, openscad_mcp; print('shared site ok')"
+          if ($LASTEXITCODE) { exit 1 }
+          $env:ARCHMCP_SITE = "payload\servers\autocad\site"
+          & $py -I -c "import os,site;site.addsitedir(os.environ['ARCHMCP_SITE']);import server;print('autocad ok')"
+          if ($LASTEXITCODE) { exit 1 }
+          $env:ARCHMCP_SITE = "payload\servers\unity\site"
+          & $py -I -c "import os,site;site.addsitedir(os.environ['ARCHMCP_SITE']);import main;print('unity ok')"
+          if ($LASTEXITCODE) { exit 1 }
+
+      - name: Build packs + signed catalog
+        env:
+          CATALOG_SIGNING_KEY: ${{ secrets.CATALOG_SIGNING_KEY }}
+          ARCHMCP_PACK_PYTHON: ${{ github.workspace }}\payload\runtime\python\python.exe
+        run: node build/build-packs.mjs --out dist/packs --ephemeral
+
+      - name: Pack smoke test (install every pack into a copy of the payload, start each server)
+        shell: pwsh
+        run: |
+          Copy-Item payload payload-smoke -Recurse
+          node build/build-payload.mjs --only none --catalog dist/packs --out payload-smoke   # embeds the key that signed this catalog
+          node build/ci-packs-smoke.mjs --app-dir payload-smoke --packs dist/packs --results dist/pack-results.json --node payload\runtime\node\node.exe
+          if ($LASTEXITCODE) { throw "no pack works at all" }
+
+      - name: Leave out packs that do not start (re-sign the catalog)
+        env:
+          CATALOG_SIGNING_KEY: ${{ secrets.CATALOG_SIGNING_KEY }}
+        run: node build/build-packs.mjs --catalog-only --out dist/packs --exclude-from dist/pack-results.json --ephemeral
+
+      - name: Catalog must verify against the public key shipped in the app (when the real key is configured)
+        shell: pwsh
+        env:
+          KEY: ${{ secrets.CATALOG_SIGNING_KEY }}
+        run: |
+          if ($env:KEY) { node build/verify-catalog.mjs dist/packs; if ($LASTEXITCODE) { exit 1 } }
+          else { Write-Warning "CATALOG_SIGNING_KEY not set: this is a development build, the catalog is signed with a throw-away key." }
+
+      - name: Finalize payload (signed catalog, SBOM, app files)
+        run: node build/build-payload.mjs --only none --catalog dist/packs
+
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress -y
+
+      - name: Code-signing certificate (optional)
+        id: cert
+        shell: pwsh
+        env:
+          PFX: ${{ secrets.WIN_CODESIGN_PFX_BASE64 }}
+        run: |
+          if ($env:PFX) {
+            [IO.File]::WriteAllBytes("$PWD\cert.pfx", [Convert]::FromBase64String($env:PFX))
+            "signed=true" >> $env:GITHUB_OUTPUT
+          } else {
+            "signed=false" >> $env:GITHUB_OUTPUT
+            Write-Warning "No code-signing certificate configured: the installer will be UNSIGNED (Windows SmartScreen will warn)."
+          }
+
+      - name: Compile installer
+        shell: pwsh
+        env:
+          PW: ${{ secrets.WIN_CODESIGN_PASSWORD }}
+        run: |
+          $v = (Get-Content versions.json | ConvertFrom-Json).app.version
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if ("${{ steps.cert.outputs.signed }}" -eq "true") {
+            $signtool = (Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin\*\x64\signtool.exe" | Sort-Object FullName | Select-Object -Last 1).FullName
+            & $iscc "/DAppVersion=$v" /DSIGN=1 "/Ssigntool=`"$signtool`" sign /f `"$PWD\cert.pfx`" /p $env:PW /fd sha256 /tr http://timestamp.digicert.com /td sha256 `$f" installer\ArchMCP.iss
+          } else {
+            & $iscc "/DAppVersion=$v" installer\ArchMCP.iss
+          }
+          if ($LASTEXITCODE) { exit 1 }
+
+      - name: Verify the signature (when signed)
+        if: steps.cert.outputs.signed == 'true'
+        shell: pwsh
+        run: |
+          $signtool = (Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin\*\x64\signtool.exe" | Sort-Object FullName | Select-Object -Last 1).FullName
+          & $signtool verify /pa /v (Get-ChildItem dist\ArchMCP-Setup-*.exe).FullName
+          if ($LASTEXITCODE) { exit 1 }
+
+      - name: Consent is enforced (silent install without /ACCEPTTERMS must fail)
+        shell: pwsh
+        run: |
+          $exe = (Get-ChildItem dist\ArchMCP-Setup-*.exe).FullName
+          $p = Start-Process $exe -Wait -PassThru -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/COMPONENTS="core,autocad"'
+          if ($p.ExitCode -eq 0) { throw "installer ran without accepting the terms" }
+          if (Test-Path "$env:LOCALAPPDATA\Programs\ArchMCP\runtime") { throw "files were installed without consent" }
+
+      - name: Silent install, then drive the INSTALLED app
+        shell: pwsh
+        run: |
+          $exe = (Get-ChildItem dist\ArchMCP-Setup-*.exe).FullName
+          New-Item -ItemType Directory -Force "$env:APPDATA\Claude" | Out-Null
+          '{"mcpServers":{"user-own":{"command":"x"}}}' | Set-Content "$env:APPDATA\Claude\claude_desktop_config.json"
+          # the user's own files in the other AI apps: they must survive install AND uninstall
+          New-Item -ItemType Directory -Force "$env:USERPROFILE\.codex","$env:USERPROFILE\.config\opencode","$env:USERPROFILE\.gemini\config" | Out-Null
+          "model = `"gpt-5`"`n`n[mcp_servers.user-own]`ncommand = `"x`"`n" | Set-Content "$env:USERPROFILE\.codex\config.toml"
+          '{"theme":"x","mcp":{"user-own":{"type":"local","command":["x"]}}}' | Set-Content "$env:USERPROFILE\.config\opencode\opencode.json"
+          '{"mcpServers":{"user-own":{"command":"x"}}}' | Set-Content "$env:USERPROFILE\.gemini\config\mcp_config.json"
+          Start-Process $exe -Wait -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/ACCEPTTERMS=1','/LOG=install.log','/COMPONENTS="core,revit,revit\r2026,autocad,photoshop,blender,freecad,openscad,godot,unity"','/TASKS="client_claude,client_codex,client_antigravity,client_opencode"'
+          $app = "$env:LOCALAPPDATA\Programs\ArchMCP"
+          Get-Content "$app\logs\setup-install.log"
+          $cfg = Get-Content "$env:APPDATA\Claude\claude_desktop_config.json" -Raw | ConvertFrom-Json
+          $names = $cfg.mcpServers.PSObject.Properties.Name
+          Write-Host "servers: $names"
+          foreach ($n in 'user-own','archmcp-revit-2026','archmcp-autocad','archmcp-photoshop','archmcp-blender','archmcp-freecad','archmcp-openscad','archmcp-godot','archmcp-unity') { if ($names -notcontains $n) { throw "missing $n" } }
+          foreach ($n in 'archmcp-blender','archmcp-unity') { if ($cfg.mcpServers.$n.env.DISABLE_TELEMETRY -ne 'true') { throw "$n telemetry not disabled" } }
+          if ($cfg.mcpServers.'archmcp-photoshop'.env.PHOTOSHOP_MCP_ALLOW -ne 'all') { throw "photoshop is not full-authority" }
+          if ($cfg.mcpServers.'archmcp-autocad'.env.DANGEROUS_COMMANDS_ENABLED) { throw "unsafe AutoCAD mode on without opt-in" }
+          if (-not (Test-Path "$env:APPDATA\Autodesk\Revit\Addins\2026\RevitMCPAddin.dll")) { throw "revit add-in not deployed" }
+          # the other AI apps got the same servers, and their own content is untouched
+          $toml = Get-Content "$env:USERPROFILE\.codex\config.toml" -Raw
+          if ($toml -notmatch 'mcp_servers\.archmcp-blender' -or $toml -notmatch 'user-own' -or $toml -notmatch 'gpt-5') { throw "codex config wrong" }
+          $oc = Get-Content "$env:USERPROFILE\.config\opencode\opencode.json" -Raw | ConvertFrom-Json
+          if (-not $oc.mcp.'archmcp-blender' -or -not $oc.mcp.'user-own' -or $oc.theme -ne 'x') { throw "opencode config wrong" }
+          $ag = Get-Content "$env:USERPROFILE\.gemini\config\mcp_config.json" -Raw | ConvertFrom-Json
+          if (-not $ag.mcpServers.'archmcp-blender' -or -not $ag.mcpServers.'user-own') { throw "antigravity config wrong" }
+          foreach ($f in 'archmcp.ico','components.json','sbom.json','catalog\catalog.json','catalog\catalog.sig','app\gui\launch.vbs','app\gui\ui\index.html','app\py\bootstrap.py','docs\GUIDE.tr.html','runtime\python\vcruntime140.dll') { if (-not (Test-Path "$app\$f")) { throw "missing $f" } }
+          & "$app\runtime\node\node.exe" "$PWD\build\ci-gui-smoke.mjs" --app-dir $app --node "$app\runtime\node\node.exe"
+          if ($LASTEXITCODE) { throw "control panel smoke test failed" }
+          # the downloadable packs, installed into the real install through the panel (offline import path)
+          & "$app\runtime\node\node.exe" "$PWD\build\ci-packs-smoke.mjs" --app-dir $app --packs dist\packs --node "$app\runtime\node\node.exe" --strict
+          if ($LASTEXITCODE) { throw "pack smoke test on the installed app failed" }
+          & "$app\runtime\node\node.exe" "$app\app\cli\doctor.mjs" --app-dir $app --strict
+
+      - name: Uninstall removes everything of ours, nothing else
+        shell: pwsh
+        run: |
+          $app = "$env:LOCALAPPDATA\Programs\ArchMCP"
+          Start-Process "$app\unins000.exe" -Wait -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART'
+          Start-Sleep 5
+          $cfg = Get-Content "$env:APPDATA\Claude\claude_desktop_config.json" -Raw | ConvertFrom-Json
+          $names = @($cfg.mcpServers.PSObject.Properties.Name)
+          Write-Host "servers after uninstall: $names"
+          if ($names | Where-Object { $_ -like 'archmcp-*' }) { throw "archmcp entries left in Claude config" }
+          if ($names -notcontains 'user-own') { throw "user's own server was removed" }
+          if ((Get-Content "$env:USERPROFILE\.codex\config.toml" -Raw) -match 'archmcp') { throw "archmcp left in codex config" }
+          if (-not ((Get-Content "$env:USERPROFILE\.codex\config.toml" -Raw) -match 'user-own')) { throw "codex user content removed" }
+          if ((Get-Content "$env:USERPROFILE\.config\opencode\opencode.json" -Raw) -match 'archmcp') { throw "archmcp left in opencode config" }
+          if ((Get-Content "$env:USERPROFILE\.gemini\config\mcp_config.json" -Raw) -match 'archmcp') { throw "archmcp left in antigravity config" }
+          if (-not ((Get-Content "$env:USERPROFILE\.gemini\config\mcp_config.json" -Raw) -match 'user-own')) { throw "antigravity user content removed" }
+          if (Test-Path "$env:APPDATA\Autodesk\Revit\Addins\2026\RevitMCPAddin.dll") { throw "revit add-in left behind" }
+          if (Test-Path "$app\runtime") { throw "app files left behind" }
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a      # v7.0.1
+        with: { name: ArchMCP-Setup, path: "dist/*.exe" }
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a      # v7.0.1
+        with:
+          name: ArchMCP-packs
+          path: |
+            dist/packs/*.zip
+            dist/packs/catalog.json
+            dist/packs/catalog.sig
+            dist/pack-results.json
+            payload/sbom.json
+
+      - name: Publish release (tags only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64   # v3.0.3
+        with:
+          files: |
+            dist/*.exe
+            dist/packs/*.zip
+            dist/packs/catalog.json
+            dist/packs/catalog.sig
+            payload/sbom.json

@@ -1,0 +1,493 @@
+{
+  "ableton": {
+    "runtime": "python",
+    "version": "1.4.5",
+    "tier": "stable",
+    "license": "MIT",
+    "homepage": "https://github.com/ahujasid/ableton-mcp",
+    "pip": [
+      "ableton-mcp==1.4.5"
+    ],
+    "launch": {
+      "kind": "module",
+      "target": "MCP_Server.server:main"
+    }
+  },
+  "fusion360": {
+    "runtime": "python",
+    "version": "0.1.0",
+    "tier": "stable",
+    "license": "MIT",
+    "homepage": "https://github.com/faust-machines/fusion360-mcp-server",
+    "pip": [
+      "fusion360-mcp-server==0.1.0",
+      "mcp>=1.9,<2"
+    ],
+    "launch": {
+      "kind": "module",
+      "target": "fusion360_mcp:main"
+    },
+    "git": {
+      "repo": "https://github.com/faust-machines/fusion360-mcp-server.git",
+      "commit": "19b9f1e9519235ae4a0f5e8dc6b029c08b87ff5f"
+    },
+    "copy": [
+      [
+        "addon",
+        "addon"
+      ]
+    ]
+  },
+  "rhino": {
+    "runtime": "python",
+    "version": "0.4.1.1",
+    "tier": "stable",
+    "license": "MIT",
+    "homepage": "https://github.com/jingcheng-chen/rhinomcp",
+    "pip": [
+      "rhinomcp==0.4.1.1"
+    ],
+    "launch": {
+      "kind": "module",
+      "target": "rhinomcp.server:main"
+    }
+  },
+  "archicad": {
+    "runtime": "python",
+    "version": "0.2.2",
+    "tier": "stable",
+    "license": "MIT",
+    "homepage": "https://github.com/Boti-Ormandi/archicad-mcp",
+    "pip": [
+      "archicad-mcp==0.2.2"
+    ],
+    "launch": {
+      "kind": "module",
+      "target": "archicad_mcp.cli:main"
+    }
+  },
+  "solidworks": {
+    "runtime": "python",
+    "version": "0.12.0",
+    "tier": "stable",
+    "license": "MIT",
+    "homepage": "https://github.com/hjbaard/SolidWorks-MCP",
+    "pip": [
+      "solidworks-mcp==0.12.0",
+      "pywin32>=306"
+    ],
+    "launch": {
+      "kind": "module",
+      "target": "solidworks_mcp.server:main"
+    }
+  },
+  "maya": {
+    "runtime": "python",
+    "version": "0.6.1",
+    "tier": "stable",
+    "license": "MIT",
+    "homepage": "https://gimbalgoats.github.io/GG_MayaMCP/",
+    "pip": [
+      "maya-mcp==0.6.1"
+    ],
+    "launch": {
+      "kind": "module",
+      "target": "maya_mcp.server:main"
+    },
+    "fetch": [
+      {
+        "url": "https://raw.githubusercontent.com/GimbalGoats/GG_MayaMCP/06862e0d50202970795ca0a89acd1a5247c2823a/scripts/enable_commandport.py",
+        "to": "addon/archmcp_enable_commandport.py",
+        "sha256": "95faaea26f8ff721e6be41fe718e2b80ac9b4e2f54f4fc3c362173c661fd1d6d"
+      }
+    ]
+  },
+  "ifc": {
+    "runtime": "python",
+    "version": "0.2.11",
+    "tier": "stable",
+    "license": "MIT",
+    "homepage": "https://github.com/imants/ifc-mcp",
+    "pip": [
+      "ifc-mcp==0.2.11"
+    ],
+    "launch": {
+      "kind": "module",
+      "target": "ifc_mcp.cli:main"
+    }
+  },
+  "bonsai": {
+    "runtime": "python",
+    "version": "0.1.0",
+    "tier": "experimental",
+    "license": "MIT",
+    "homepage": "https://github.com/JotaDeRodriguez/Bonsai_mcp",
+    "pip": [
+      "httpx>=0.28.1",
+      "mcp[cli]>=1.4.1,<1.10",
+      "pillow>=11.3.0"
+    ],
+    "git": {
+      "repo": "https://github.com/JotaDeRodriguez/Bonsai_mcp.git",
+      "commit": "1d8478f5d235dc27e2ab905cd7640f14070a41b4"
+    },
+    "copy": [
+      [
+        "tools.py",
+        "app/tools.py"
+      ],
+      [
+        "bc3_writer.py",
+        "app/bc3_writer.py"
+      ],
+      [
+        "list_ifc_entities.py",
+        "app/list_ifc_entities.py"
+      ],
+      [
+        "resources",
+        "app/resources"
+      ],
+      [
+        "addon.py",
+        "addon/addon.py"
+      ]
+    ],
+    "patches": [
+      {
+        "file": "app/tools.py",
+        "from": "BlenderConnection(host=\"localhost\", port=9876)",
+        "to": "BlenderConnection(host=\"localhost\", port=int(__import__(\"os\").environ.get(\"BONSAI_MCP_PORT\", \"9876\")))"
+      }
+    ],
+    "launch": {
+      "kind": "module",
+      "target": "tools:main",
+      "path": "app"
+    }
+  },
+  "qgis": {
+    "runtime": "python",
+    "version": "0.1.0",
+    "tier": "experimental",
+    "license": "unspecified",
+    "homepage": "https://github.com/jjsantos01/qgis_mcp",
+    "pip": [
+      "mcp[cli]>=1.3.0,<1.10"
+    ],
+    "git": {
+      "repo": "https://github.com/jjsantos01/qgis_mcp.git",
+      "commit": "e37bf6f095e1658a8939cb7d8467c1e61d138bd2"
+    },
+    "copy": [
+      [
+        "src/qgis_mcp",
+        "app/qgis_mcp"
+      ],
+      [
+        "qgis_mcp_plugin",
+        "addon/qgis_mcp_plugin"
+      ]
+    ],
+    "patches": [
+      {
+        "file": "app/qgis_mcp/qgis_mcp_server.py",
+        "from": "port=9876",
+        "to": "port=int(__import__(\"os\").environ.get(\"QGIS_MCP_PORT\", \"9876\"))",
+        "all": true
+      }
+    ],
+    "launch": {
+      "kind": "module",
+      "target": "qgis_mcp.qgis_mcp_server:main",
+      "path": "app"
+    }
+  },
+  "altium": {
+    "runtime": "python",
+    "version": "0.4.6",
+    "tier": "experimental",
+    "license": "MIT",
+    "homepage": "https://github.com/coffeenmusic/altium-mcp",
+    "pip": [
+      "mcp[cli]==1.5.0",
+      "pillow>=11.1",
+      "pywin32>=306"
+    ],
+    "git": {
+      "repo": "https://github.com/coffeenmusic/altium-mcp.git",
+      "commit": "16df4f12522652dfdc702626721476002101af8f"
+    },
+    "copy": [
+      [
+        "server",
+        "app/server"
+      ],
+      [
+        "start_server.py",
+        "app/start_server.py"
+      ]
+    ],
+    "launch": {
+      "kind": "script",
+      "path": "app/server/main.py"
+    },
+    "hold": [
+      "mcp"
+    ]
+  },
+  "abaqus": {
+    "runtime": "python",
+    "version": "4.0.1",
+    "tier": "experimental",
+    "license": "MIT",
+    "homepage": "https://github.com/Cai-aa/abaqus-mcp",
+    "pip": [
+      "mcp[cli]>=1.0.0,<2"
+    ],
+    "git": {
+      "repo": "https://github.com/Cai-aa/abaqus-mcp.git",
+      "commit": "48aa612ad37bfdc1a7af96181edc749273cc6987"
+    },
+    "copy": [
+      [
+        "mcp_server.py",
+        "app/mcp_server.py"
+      ],
+      [
+        "abaqus_mcp_plugin.py",
+        "addon/abaqus_mcp_plugin.py"
+      ],
+      [
+        "abaqus_plugins",
+        "addon/abaqus_plugins"
+      ],
+      [
+        "abaqus_v6.env.example",
+        "addon/abaqus_v6.env.example"
+      ]
+    ],
+    "launch": {
+      "kind": "script",
+      "path": "app/mcp_server.py"
+    }
+  },
+  "ansys": {
+    "runtime": "python",
+    "version": "0.1.0",
+    "tier": "experimental",
+    "license": "MIT",
+    "homepage": "https://github.com/hongwenwang36-eng/ANSYS-Workbench-mcp",
+    "pip": [
+      "mcp>=1.27.0,<2"
+    ],
+    "git": {
+      "repo": "https://github.com/hongwenwang36-eng/ANSYS-Workbench-mcp.git",
+      "commit": "436ba235d658100f7aec1838a49fb99c2004c7df"
+    },
+    "copy": [
+      [
+        "mcp_server.py",
+        "app/mcp_server.py"
+      ],
+      [
+        "ansys_workbench_bridge.wbjn",
+        "app/ansys_workbench_bridge.wbjn"
+      ],
+      [
+        "commands",
+        "app/commands"
+      ],
+      [
+        "scripts",
+        "app/scripts"
+      ]
+    ],
+    "launch": {
+      "kind": "script",
+      "path": "app/mcp_server.py"
+    },
+    "hold": [
+      "git"
+    ]
+  },
+  "nx": {
+    "runtime": "python",
+    "version": "0.2.0.dev0",
+    "tier": "experimental",
+    "license": "MIT",
+    "homepage": "https://github.com/DreamEnding/NX_MCP",
+    "pip": [
+      "mcp>=2.2,<3",
+      "pydantic>=2.12,<3"
+    ],
+    "git": {
+      "repo": "https://github.com/DreamEnding/NX_MCP.git",
+      "commit": "c596416b7b9a5ea0db08dafa1f3a60a22f553664"
+    },
+    "copy": [
+      [
+        "src/nx_mcp",
+        "app/nx_mcp"
+      ],
+      [
+        "nx_gui_bridge",
+        "addon/nx_gui_bridge"
+      ]
+    ],
+    "launch": {
+      "kind": "module",
+      "target": "nx_mcp.server:main",
+      "path": "app"
+    }
+  },
+  "inventor": {
+    "runtime": "python",
+    "version": "0.1.0",
+    "tier": "experimental",
+    "license": "MIT",
+    "homepage": "https://github.com/NeonGlay/inventor-mcp",
+    "pip": [
+      "mcp[cli]>=1.0.0,<2",
+      "pywin32>=306"
+    ],
+    "git": {
+      "repo": "https://github.com/NeonGlay/inventor-mcp.git",
+      "commit": "3809700ed2e34164f3c45bec5a50aed347448383"
+    },
+    "copy": [
+      [
+        "src",
+        "app/src"
+      ]
+    ],
+    "launch": {
+      "kind": "module",
+      "target": "src.server:main",
+      "path": "app"
+    }
+  },
+  "etabs": {
+    "runtime": "python",
+    "version": "0.1.0",
+    "tier": "experimental",
+    "license": "MIT",
+    "homepage": "https://github.com/GreatApo/FEA-MCP",
+    "pip": [
+      "mcp>=1.0.0,<2",
+      "pywin32>=306",
+      "comtypes>=1.4.0"
+    ],
+    "git": {
+      "repo": "https://github.com/GreatApo/FEA-MCP.git",
+      "commit": "7aff53b5e1b367ac7162df75660e96815124ba17"
+    },
+    "copy": [
+      [
+        "src",
+        "app/src"
+      ]
+    ],
+    "patches": [
+      {
+        "file": "app/src/config.json",
+        "from": "\"software\": \"LUSAS\"",
+        "to": "\"software\": \"ETABS\""
+      }
+    ],
+    "launch": {
+      "kind": "script",
+      "path": "app/src/server.py"
+    }
+  },
+  "opensees": {
+    "runtime": "python",
+    "version": "0.1.0",
+    "tier": "experimental",
+    "license": "MIT (ArchMCP)",
+    "homepage": "https://openseespy.readthedocs.io/",
+    "pip": [
+      "openseespywin==3.8.0.0",
+      "mcp[cli]>=1.9.0",
+      "numpy"
+    ],
+    "local": "packs/opensees",
+    "launch": {
+      "kind": "module",
+      "target": "archmcp_opensees:main"
+    },
+    "noDepsExtra": [
+      "openseespy==3.8.0.0"
+    ]
+  },
+  "unreal": {
+    "runtime": "node",
+    "version": "0.1.4",
+    "tier": "stable",
+    "license": "MIT",
+    "homepage": "https://github.com/runreal/unreal-mcp",
+    "npm": "@runreal/unreal-mcp@0.1.4",
+    "launch": {
+      "kind": "node",
+      "path": "node_modules/@runreal/unreal-mcp/dist/bin.js"
+    }
+  },
+  "matlab": {
+    "runtime": "exe",
+    "version": "0.14.0",
+    "tier": "stable",
+    "license": "see upstream",
+    "homepage": "https://github.com/matlab/matlab-mcp-server",
+    "release": {
+      "repo": "matlab/matlab-mcp-server",
+      "tag": "v0.14.0",
+      "asset": "matlab-mcp-server-windows-x64.exe",
+      "sha256": "6697a8962f148628f11d93b36960235871de5614905d6a27c55341c2b83f4118"
+    },
+    "launch": {
+      "kind": "exe",
+      "path": "bin/matlab-mcp-server.exe"
+    }
+  },
+  "comsol": {
+    "runtime": "python",
+    "version": "0.1.9",
+    "tier": "experimental",
+    "license": "MIT",
+    "homepage": "https://github.com/Ching-Chiang/comsol-mcp",
+    "pip": [
+      "mcp>=1.30,<2",
+      "MPh>=1.3,<2",
+      "JPype1>=1.5"
+    ],
+    "git": {
+      "repo": "https://github.com/Ching-Chiang/comsol-mcp.git",
+      "commit": "ccca65aa8277d1205c5de5fb6221e460aca5997a"
+    },
+    "copy": [
+      [
+        "comsol_mcp",
+        "app/comsol_mcp"
+      ]
+    ],
+    "launch": {
+      "kind": "module",
+      "target": "comsol_mcp.mcp_server:main",
+      "path": "app"
+    }
+  },
+  "ltspice": {
+    "runtime": "python",
+    "version": "0.6.1",
+    "tier": "experimental",
+    "license": "GPL-3.0-or-later",
+    "homepage": "https://github.com/Cognitohazard/ltspice-mcp",
+    "pip": [
+      "ltspice-mcp==0.6.1"
+    ],
+    "launch": {
+      "kind": "module",
+      "target": "ltspice_mcp.main:main"
+    }
+  }
+}

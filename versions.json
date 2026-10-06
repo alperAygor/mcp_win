@@ -1,0 +1,79 @@
+{
+  "app": {
+    "name": "ArchMCP",
+    "version": "0.2.0",
+    "publisher": "ArchMCP"
+  },
+  "node": {
+    "version": "22.23.3",
+    "url": "https://nodejs.org/dist/v22.23.3/node-v22.23.3-win-x64.zip",
+    "shasumsUrl": "https://nodejs.org/dist/v22.23.3/SHASUMS256.txt",
+    "fileName": "node-v22.23.3-win-x64.zip"
+  },
+  "python": {
+    "version": "3.12.15",
+    "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20261003/cpython-3.12.15%2B20261003-x86_64-pc-windows-msvc-install_only_stripped.tar.gz",
+    "shared": [
+      "mcp-for-blender==2.1.8",
+      "freecad-mcp==0.1.25",
+      "openscad-mcp==0.6.1",
+      "pywin32>=306"
+    ],
+    "isolated": {
+      "autocad": {
+        "spec": "autocad-mcp-pro[com]==1.6.0",
+        "dist": "autocad_mcp_pro"
+      },
+      "unity": {
+        "spec": "mcpforunityserver==10.3.0",
+        "dist": "mcpforunityserver"
+      }
+    }
+  },
+  "revit": {
+    "version": "0.8.40",
+    "url": "https://github.com/KenLP/RevitMCPServer/releases/download/v0.8.40/RevitMCPServer-v0.8.40.zip",
+    "sha256Url": "https://github.com/KenLP/RevitMCPServer/releases/download/v0.8.40/RevitMCPServer-v0.8.40.zip.sha256",
+    "supported": [
+      2025,
+      2026,
+      2027
+    ],
+    "portBase": 7891
+  },
+  "photoshop": {
+    "repo": "https://github.com/drmedia/photoshop-mcp.git",
+    "commit": "c9e4ed0ee98e02536c221a57b1f4967788cddecd"
+  },
+  "sketchup": {
+    "connectorUrl": "https://api.sketchup.com/mcp/v1/sketchup/mcp",
+    "marketplaceUrl": "https://claude.com/marketplace/connectors/sketchup"
+  },
+  "autocad": {
+    "version": "1.6.0",
+    "repo": "https://github.com/U-C4N/Autocad-MCP"
+  },
+  "blender": {
+    "version": "2.1.8",
+    "repo": "https://github.com/ahujasid/mcp-for-blender"
+  },
+  "openscad": {
+    "version": "0.6.1",
+    "repo": "https://github.com/RobertCoop/openscad-mcp"
+  },
+  "freecad": {
+    "version": "0.1.25",
+    "repo": "https://github.com/neka-nat/freecad-mcp.git",
+    "commit": "d6bbe4b38be3a622b5981d9d2afa7037ee080534"
+  },
+  "godot": {
+    "version": "0.1.1",
+    "npm": "@coding-solo/godot-mcp@0.1.1",
+    "repo": "https://github.com/Coding-Solo/godot-mcp"
+  },
+  "unity": {
+    "version": "10.3.0",
+    "repo": "https://github.com/CoplayDev/unity-mcp.git",
+    "commit": "aa5fc638d623f56178d50329d9ad8c541a57fe66"
+  }
+}

@@ -1,0 +1,32 @@
+﻿BEFORE YOU INSTALL - PLEASE READ
+
+REQUIREMENTS
+ - Windows 10/11 (64-bit)
+ - Claude Desktop, signed in with your own Claude subscription
+ - At least one of:
+     Autodesk Revit 2025, 2026 or 2027
+     Autodesk AutoCAD 2026  (ONLY 2026 is supported and tested; older versions may not work)
+     Adobe Photoshop 25 or newer (Creative Cloud)
+     Blender 3.x/4.x/5.x, FreeCAD 0.21/1.x, OpenSCAD, Godot 4.x, Unity 2021.3 LTS - 6.x
+   All are optional; pick only what you use. You can add more later by running setup again.
+ - SketchUp: not installed by this setup; add it after setup in Claude > Settings > Connectors.
+
+BEFORE YOU START
+ 1. Close Revit, AutoCAD, Photoshop, Blender, FreeCAD and Unity.
+ 2. Fully quit Claude Desktop (also from the system tray).
+ 3. Back up your important projects.
+
+WINDOWS SMARTSCREEN WARNING
+This installer may not be digitally signed yet. If Windows shows "Windows protected your PC":
+   "More info"  ->  "Run anyway"
+Do this only if you downloaded the installer from our official page.
+
+ANTIVIRUS WARNING
+Setup contains Node.js and Python runtimes. Some antivirus products may wrongly block or quarantine them. If setup stalls or files disappear:
+   1. First add this folder to your antivirus exclusions:
+         %LOCALAPPDATA%\Programs\ArchMCP
+   2. If it is still blocked, TEMPORARILY disable your antivirus during setup and re-enable it right after.
+Only disable it if you downloaded the installer from our official source.
+
+NO ADMINISTRATOR RIGHTS NEEDED
+Everything installs into your user profile.

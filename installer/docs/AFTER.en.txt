@@ -1,0 +1,25 @@
+﻿
+SETUP COMPLETE - FIRST STEPS
+
+ArchMCP control panel: Start menu or the "ArchMCP" desktop shortcut.
+Switch the software you want to connect to Claude on and off, change settings, test and apply.
+
+1. Open ArchMCP and switch on the connections you want.
+2. Press "Apply and restart Claude" (Claude starts the servers when it launches).
+3. Get your software ready (see "Details" on each card):
+   Revit      : open Revit and a project (if a security prompt appears, choose "Always Load").
+   AutoCAD    : open AutoCAD 2026 and a drawing.
+   Photoshop  : Plugins > open the "Photoshop MCP" panel.
+   Blender    : the add-on must be enabled; N panel > "MCP for Blender" > "Start MCP Server" if needed.
+   FreeCAD    : "MCP Addon" workbench > "Start RPC Server".
+   OpenSCAD   : OpenSCAD must be installed (path is found automatically).
+   Godot      : pick the godot.exe path in the panel.
+   Unity      : add the project in the panel and press "Add package", then open the project in Unity.
+   SketchUp   : Claude > Settings > Connectors > add "SketchUp" and sign in.
+4. In Claude you will see the "archmcp-..." servers under the tools icon of the chat box. Try: "List the levels in my open Revit project."
+
+IMPORTANT: With the authority you granted, Claude can modify/delete your files. Back up before you work. You can narrow the authority in the panel.
+
+PROBLEMS?
+ArchMCP > "Diagnostics" really starts every server and tests it. Detailed guide: Start menu > ArchMCP > "User Guide".
+To remove: Settings > Apps > ArchMCP.

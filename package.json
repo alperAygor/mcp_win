@@ -1,0 +1,12 @@
+{
+  "name": "archmcp-installer",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test \"tests/*.test.mjs\"",
+    "build:payload": "node build/build-payload.mjs",
+    "gui": "node app/gui/launcher.mjs --no-open --keep-alive",
+    "doctor": "node app/cli/doctor.mjs"
+  }
+}

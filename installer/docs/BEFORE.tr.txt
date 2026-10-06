@@ -1,0 +1,32 @@
+﻿KURULUMDAN ÖNCE - LÜTFEN OKUYUN
+
+GEREKSİNİMLER
+ - Windows 10/11 (64 bit)
+ - Claude Desktop, kendi Claude üyeliğinizle giriş yapılmış olarak
+ - Aşağıdakilerden en az biri:
+     Autodesk Revit 2025, 2026 veya 2027
+     Autodesk AutoCAD 2026  (YALNIZCA 2026 desteklenir ve test edilmiştir; eski sürümlerde çalışmayabilir)
+     Adobe Photoshop 25 veya üzeri (Creative Cloud)
+     Blender 3.x/4.x/5.x, FreeCAD 0.21/1.x, OpenSCAD, Godot 4.x, Unity 2021.3 LTS - 6.x
+   Hepsi isteğe bağlıdır; yalnızca kullanacaklarınızı seçin, sonradan kurulumu yeniden çalıştırarak ekleyebilirsiniz.
+ - SketchUp: kurulumla gelmez; kurulumdan sonra Claude > Ayarlar > Bağlayıcılar'dan eklenir.
+
+KURULUMDAN ÖNCE
+ 1. Revit, AutoCAD, Photoshop, Blender, FreeCAD ve Unity'yi kapatın.
+ 2. Claude Desktop'ı tamamen kapatın (görev çubuğundaki sistem tepsisinden de çıkın).
+ 3. Önemli projelerinizin yedeğini alın.
+
+WINDOWS SMARTSCREEN UYARISI
+Bu kurulum dosyası henüz dijital olarak imzalı olmayabilir. Windows, "Windows bilgisayarınızı korudu" uyarısı gösterirse:
+   "Daha fazla bilgi"  ->  "Yine de çalıştır"
+Bunu yalnızca kurulum dosyasını bizim resmi sayfamızdan indirdiyseniz yapın.
+
+ANTİVİRÜS UYARISI
+Kurulum, Node.js ve Python çalışma ortamlarını içerir. Bazı antivirüs programları bunları yanlışlıkla engelleyebilir veya karantinaya alabilir. Kurulum takılırsa veya dosyalar silinirse:
+   1. Önce şu klasörü antivirüsünüzün istisna listesine ekleyin:
+         %LOCALAPPDATA%\Programs\ArchMCP
+   2. Hâlâ engelleniyorsa, kurulum süresince antivirüsü GEÇİCİ olarak kapatın; kurulum bitince hemen tekrar açın.
+Antivirüsü yalnızca kurulum dosyasını resmi kaynağımızdan indirdiyseniz kapatın.
+
+YÖNETİCİ İZNİ GEREKMEZ
+Her şey kullanıcı profilinize kurulur.
