@@ -42,22 +42,23 @@ jobs:
           if (-not $env:TOKEN -and $env:ARCHMCP_PACKS_REPO -ne $env:GITHUB_REPOSITORY) { throw "Secret PACKS_REPO_TOKEN is not set: a token with write access to the public packs repository $env:ARCHMCP_PACKS_REPO (see README > Publishing)." }
 
       - name: Unit tests
-        run: npm test
+        run: node build/ci-run.mjs "Unit tests" -- node --test --test-reporter=spec "tests/*.test.mjs"
 
       - name: Bundled Node + Python (the packs are built and tested with exactly what ships)
-        run: node build/build-payload.mjs --only node,python
+        run: node build/ci-run.mjs "Runtimes" -- node build/build-payload.mjs --only node,python
 
       - name: Build packs + signed catalog
         env:
           CATALOG_SIGNING_KEY: ${{ secrets.CATALOG_SIGNING_KEY }}
           ARCHMCP_PACK_PYTHON: ${{ github.workspace }}\payload\runtime\python\python.exe
-        run: node build/build-packs.mjs --out dist/packs
+        run: node build/ci-run.mjs "Build packs" -- node build/build-packs.mjs --out dist/packs
 
       - name: Pack smoke test (install every pack, start each server)
         shell: pwsh
         run: |
-          node build/build-payload.mjs --only none --catalog dist/packs
-          node build/ci-packs-smoke.mjs --app-dir payload --packs dist/packs --results dist/pack-results.json --node payload\runtime\node\node.exe
+          node build/ci-run.mjs "Payload refresh" -- node build/build-payload.mjs --only none --catalog dist/packs
+          if ($LASTEXITCODE) { exit 1 }
+          node build/ci-run.mjs "Pack smoke" -- node build/ci-packs-smoke.mjs --app-dir payload --packs dist/packs --results dist/pack-results.json --node payload\runtime\node\node.exe
           if ($LASTEXITCODE) { throw "no pack works at all" }
 
       - name: Leave out packs that do not start (re-sign the catalog)

@@ -29,10 +29,10 @@ jobs:
         with: { python-version: "3.12" }
 
       - name: Unit tests
-        run: npm test
+        run: node build/ci-run.mjs "Unit tests" -- node --test --test-reporter=spec "tests/*.test.mjs"
 
       - name: Build core payload (Node, Python, Revit, Photoshop, Godot, Unity, FreeCAD)
-        run: node build/build-payload.mjs
+        run: node build/ci-run.mjs "Core payload" -- node build/build-payload.mjs
 
       - name: Smoke-test bundled runtimes and every Python server of the core
         shell: pwsh
@@ -52,20 +52,21 @@ jobs:
         env:
           CATALOG_SIGNING_KEY: ${{ secrets.CATALOG_SIGNING_KEY }}
           ARCHMCP_PACK_PYTHON: ${{ github.workspace }}\payload\runtime\python\python.exe
-        run: node build/build-packs.mjs --out dist/packs --ephemeral
+        run: node build/ci-run.mjs "Build packs" -- node build/build-packs.mjs --out dist/packs --ephemeral
 
       - name: Pack smoke test (install every pack into a copy of the payload, start each server)
         shell: pwsh
         run: |
           Copy-Item payload payload-smoke -Recurse
-          node build/build-payload.mjs --only none --catalog dist/packs --out payload-smoke   # embeds the key that signed this catalog
-          node build/ci-packs-smoke.mjs --app-dir payload-smoke --packs dist/packs --results dist/pack-results.json --node payload\runtime\node\node.exe
+          node build/ci-run.mjs "Payload copy for pack smoke" -- node build/build-payload.mjs --only none --catalog dist/packs --out payload-smoke   # embeds the key that signed this catalog
+          if ($LASTEXITCODE) { exit 1 }
+          node build/ci-run.mjs "Pack smoke" -- node build/ci-packs-smoke.mjs --app-dir payload-smoke --packs dist/packs --results dist/pack-results.json --node payload\runtime\node\node.exe
           if ($LASTEXITCODE) { throw "no pack works at all" }
 
       - name: Leave out packs that do not start (re-sign the catalog)
         env:
           CATALOG_SIGNING_KEY: ${{ secrets.CATALOG_SIGNING_KEY }}
-        run: node build/build-packs.mjs --catalog-only --out dist/packs --exclude-from dist/pack-results.json --ephemeral
+        run: node build/ci-run.mjs "Re-sign catalog" -- node build/build-packs.mjs --catalog-only --out dist/packs --exclude-from dist/pack-results.json --ephemeral
 
       - name: Catalog must verify against the public key shipped in the app (when the real key is configured)
         shell: pwsh
@@ -76,7 +77,7 @@ jobs:
           else { Write-Warning "CATALOG_SIGNING_KEY not set: this is a development build, the catalog is signed with a throw-away key." }
 
       - name: Finalize payload (signed catalog, SBOM, app files)
-        run: node build/build-payload.mjs --only none --catalog dist/packs
+        run: node build/ci-run.mjs "Finalize payload" -- node build/build-payload.mjs --only none --catalog dist/packs
 
       - name: Install Inno Setup
         run: choco install innosetup --no-progress -y
