@@ -18,7 +18,8 @@ export function makeContext({ appDir, env = process.env, sep = process.platform 
     appData,
     localAppData,
     userProfile: env.USERPROFILE ?? homedir(),
-    programFiles: [env.ProgramFiles, env["ProgramFiles(x86)"]].filter(Boolean),
+    // ARCHMCP_PROGRAM_FILES (";"-separated) adds search roots for host programs (portable installs, tests: Windows overwrites ProgramFiles in child processes)
+    programFiles: [...new Set([...(env.ARCHMCP_PROGRAM_FILES ?? "").split(";"), env.ProgramFiles, env["ProgramFiles(x86)"]].filter(Boolean))],
     commonProgramFiles: [env.CommonProgramFiles, env["CommonProgramFiles(x86)"], env.ProgramFiles].filter(Boolean),
     dataDir: join(appData, "ArchMCP"), // settings + GUI logs: survive reinstalls
     /** Path string that goes into Claude's config (always Windows-style, even in tests on macOS). */

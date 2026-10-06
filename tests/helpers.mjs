@@ -11,7 +11,7 @@ export function fakePc({ installed = REGISTRY.map((d) => d.id), apps = {} } = {}
   const root = mkdtempSync(join(tmpdir(), "am-"));
   const env = {
     APPDATA: join(root, "Roaming"), LOCALAPPDATA: join(root, "Local"), USERPROFILE: join(root, "User"),
-    ProgramFiles: join(root, "PF"), CommonProgramFiles: join(root, "CPF"),
+    ProgramFiles: join(root, "PF"), CommonProgramFiles: join(root, "CPF"), ARCHMCP_PROGRAM_FILES: join(root, "PF"),
   };
   const appDir = join(root, "app");
   const touch = (p, body = "x") => { mkdirSync(dirname(p), { recursive: true }); writeFileSync(p, body); return p; };
